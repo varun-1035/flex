@@ -32,13 +32,13 @@
             background: linear-gradient(135deg, var(--color-background), var(--color-dark));
             color: white;
             min-height: 100vh;
-            padding: 20px;
         }
 
         .container {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 20px;
+            padding: 40px 20px 20px;
+            position: relative;
         }
 
         .tutor-card {
@@ -349,6 +349,64 @@
             font-size: 18px;
             color: var(--color-light);
         }
+
+        /* New styles for back button */
+        .back-button {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: var(--color-tertiary);
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.2em;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .back-button:hover {
+            background: var(--color-secondary);
+            transform: scale(1.1);
+        }
+
+        /* Responsive styles */
+        @media (max-width: 768px) {
+            .container {
+                padding: 30px 10px 10px;
+            }
+
+            .tutor-card {
+                padding: 15px;
+            }
+
+            .tutor-info {
+                grid-template-columns: 1fr;
+            }
+
+            .enroll-section {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .video-button {
+                margin-top: 10px;
+            }
+
+            .back-button {
+                top: 10px;
+                left: 10px;
+                width: 35px;
+                height: 35px;
+                font-size: 1em;
+            }
+        }
     </style>
 </head>
 <body>
@@ -356,21 +414,16 @@
         <dotlottie-player src="https://lottie.host/a81ef307-7531-4580-b3ce-5369195af9de/g88KkRKAdW.lottie" background="transparent" speed="1" style="width: 300px; height: 300px" loop autoplay></dotlottie-player>
     </div>
     <div class="container">
+        <button class="back-button" onclick="goBack()">
+            <i class="fas fa-arrow-left"></i>
+        </button>
         <div id="message"></div>
         <div id="permissionMessage" style="display: none; background-color: rgba(255, 255, 255, 0.9); color: black; padding: 10px; border-radius: 5px; margin-bottom: 10px;">
             Please allow camera and microphone permissions to join the class. If prompted, please also allow fullscreen and storage access.
         </div>
         <div id="tutorDetails" class="tutor-card">
             <!-- Tutor details will be loaded here -->
-        </div>
-
-        <div id="videoCallContainer">
-            <button class="close-button" onclick="closeVideoCall()">
-                <i class="fas fa-times"></i> Close
-            </button>
-            <div class="video-interface">
-                <iframe id="jioMeetFrame" allow="camera; microphone; fullscreen; display-capture; autoplay"></iframe>
-            </div>
+            <div id="errorMessage" style="display: none; color: red; text-align: center; margin-top: 20px;"></div>
         </div>
     </div>
 
@@ -384,22 +437,31 @@
         let demoRequest = null;
         let currentClassType = 'individual';
 
+        function goBack() {
+            window.location.href = 'tutors.html';
+        }
+
         async function loadTutorDetails() {
             try {
+                console.log('Starting to load tutor details');
                 document.getElementById('loadingAnimation').style.display = 'flex';
                 currentUserEmail = await getCurrentUserEmail();
                 if (!currentUserEmail) {
+                    console.log('User email not found');
                     showMessage('Please log in to view tutor details', 'error');
                     return;
                 }
+                console.log('Current user email:', currentUserEmail);
 
                 const urlParams = new URLSearchParams(window.location.search);
                 const tutorId = urlParams.get('id');
 
                 if (!tutorId) {
+                    console.log('No tutor ID provided');
                     showMessage('No tutor ID provided', 'error');
                     return;
                 }
+                console.log('Tutor ID:', tutorId);
 
                 const { data: tutor, error } = await supabase
                     .from('alltutor')
@@ -407,7 +469,10 @@
                     .eq('id', tutorId)
                     .single();
 
-                if (error) throw error;
+                if (error) {
+                    console.error('Error fetching tutor details:', error);
+                    throw error;
+                }
 
                 currentTutor = tutor;
                 console.log('Loaded tutor details:', currentTutor);
@@ -437,6 +502,7 @@
         }
 
         function updateTutorDetailsUI(tutor, demoRequest) {
+            console.log('Updating tutor details UI');
             const defaultClassType = tutor.individual_class ? 'individual' : 'group';
             currentClassType = defaultClassType;
 
@@ -587,7 +653,7 @@
                 case 'approved':
                     if (demoRequest.demostatus === 'pending') {
                         if (demoRequest.meet_link) {
-                            return `<button class="video-button" onclick="joinMeeting('${demoRequest.meet_link}')"><span>Join Demo</span></button>`;
+                            return `<button class="video-button" onclick="joinMeeting('${demoRequest.meet_link}', true)"><span>Join Demo</span></button>`;
                         } else {
                             return `
                                 <button class="video-button" disabled><span>Waiting for Meet Link</span></button>
@@ -620,7 +686,7 @@
                         if (now >= scheduledTime) {
                             if (demoRequest.meet_link) {
                                 return `
-                                    <button class="video-button" onclick="joinMeeting('${demoRequest.meet_link}')"><span>Join Class</span></button>
+                                    <button class="video-button" onclick="joinMeeting('${demoRequest.meet_link}', false)"><span>Join Class</span></button>
                                     <span>${new Date(demoRequest.scheduled_time).toLocaleString()}</span>
                                 `;
                             } else {
@@ -663,7 +729,11 @@
                     .eq('tutor_id', currentTutor.id)
                     .maybeSingle();
 
-                if (checkError) throw checkError;
+                if (checkError) {
+                    console.error('Error checking existing request:', checkError);
+                    showMessage('Error checking existing request', 'error');
+                    return;
+                }
 
                 if (existingRequest) {
                     showMessage('You have already requested a demo with this tutor', 'error');
@@ -684,7 +754,11 @@
                         }
                     ]);
 
-                if (insertError) throw insertError;
+                if (insertError) {
+                    console.error('Error inserting demo request:', insertError);
+                    showMessage('Error submitting demo request', 'error');
+                    return;
+                }
 
                 showMessage('Demo request submitted successfully', 'success');
                 
@@ -694,8 +768,37 @@
 
             } catch (error) {
                 console.error('Demo request error:', error);
-                showMessage('Error submitting demo request', 'error');
+                showMessage('Error submitting demo request: ' + error.message, 'error');
             }
+        }
+
+        function showMessage(message, type) {
+            console.log(`${type.toUpperCase()}: ${message}`); // Always log the message
+            
+            const messageDiv = document.getElementById('message');
+            const errorMessageDiv = document.getElementById('errorMessage');
+            
+            if (messageDiv) {
+                messageDiv.textContent = message;
+                messageDiv.className = type;
+                messageDiv.style.display = 'block';
+            }
+            
+            if (type === 'error' && errorMessageDiv) {
+                errorMessageDiv.textContent = message;
+                errorMessageDiv.style.display = 'block';
+            } else if (errorMessageDiv) {
+                errorMessageDiv.style.display = 'none';
+            }
+            
+            setTimeout(() => {
+                if (messageDiv) {
+                    messageDiv.style.display = 'none';
+                }
+                if (type === 'error' && errorMessageDiv) {
+                    errorMessageDiv.style.display = 'none';
+                }
+            }, 5000);
         }
 
         function showExtendedClassOption() {
@@ -728,12 +831,13 @@
                 const priceKey = currentClassType === 'individual' 
                     ? `${demoRequest.assigned_stage}_price` 
                     : `group_${demoRequest.assigned_stage}_price`;
-                basePrice = currentTutor[priceKey];
+                basePrice = currentTutor[priceKey] || 0; // Add fallback to 0
             } else {
                 basePrice = currentClassType === 'individual' ? currentTutor.initial_price : currentTutor.group_initial_price;
             }
+            basePrice = parseFloat(basePrice) || 0; // Ensure basePrice is a number
             const totalAmount = basePrice * classCount;
-            document.getElementById('totalAmount').textContent = `$${totalAmount}`;
+            document.getElementById('totalAmount').textContent = `$${totalAmount.toFixed(2)}`; // Format to 2 decimal places
         }
 
         async function enrollCourse() {
@@ -782,12 +886,12 @@
                     const priceKey = currentClassType === 'individual' 
                         ? `${demoRequest.assigned_stage}_price` 
                         : `group_${demoRequest.assigned_stage}_price`;
-                    baseAmount = currentTutor[priceKey];
+                    baseAmount = parseFloat(currentTutor[priceKey]) || 0; // Parse and fallback to 0
                 } else {
-                    baseAmount = currentClassType === 'individual' ? currentTutor.initial_price : currentTutor.group_initial_price;
+                    baseAmount = parseFloat(currentClassType === 'individual' ? currentTutor.initial_price : currentTutor.group_initial_price) || 0;
                 }
 
-                if (!baseAmount) {
+                if (isNaN(baseAmount) || baseAmount <= 0) {
                     console.error('Invalid price for selected stage and class type');
                     showMessage('Invalid price for selected stage and class type', 'error');
                     return;
@@ -851,10 +955,10 @@
                             console.log('Enrollment saved successfully:', updatedRequest);
                             showMessage('Course enrollment successful!', 'success');
                             setTimeout(() => {
-                                window.location.reload();
+                                window.location.href = 'my-courses.html';
                             }, 2000);
                         } catch (error) {
-                            console.error('Error in paymenthandler:', error);
+                            console.error('Error in payment handler:', error);
                             showMessage('Error completing enrollment: ' + error.message, 'error');
                         }
                     },
@@ -904,73 +1008,14 @@
             return selectedTiming ? selectedTiming.dataset.timing : false;
         }
 
-        async function joinMeeting(meetLink) {
-            document.getElementById('permissionMessage').style.display = 'block';
-            const permissionsGranted = await requestPermissions();
-            if (!permissionsGranted) {
-                showMessage('Please allow camera and microphone access to join the meeting', 'error');
-                document.getElementById('permissionMessage').style.display = 'none';
-                return;
-            }
-            const container = document.getElementById('videoCallContainer');
-            const frame = document.getElementById('jioMeetFrame');
-            container.style.display = 'block';
-            frame.src = meetLink;
-
-            try {
-                await document.documentElement.requestFullscreen();
-            } catch (error) {
-                console.error('Error requesting fullscreen:', error);
-            }
-
-            document.addEventListener('fullscreenchange', handleFullscreenChange);
-            document.getElementById('permissionMessage').style.display = 'none';
-        }
-
-        function handleFullscreenChange() {
-            if (!document.fullscreenElement) {
-                closeVideoCall();
+        async function joinMeeting(meetLink, isDemoClass = false) {
+            if (isDemoClass) {
+                openMeetingDirectly(meetLink);
+            } else {
+                window.location.href = `my-courses.html?meet_link=${encodeURIComponent(meetLink)}`;
             }
         }
 
-        function closeVideoCall() {
-            const container = document.getElementById('videoCallContainer');
-            const frame = document.getElementById('jioMeetFrame');
-            container.style.display = 'none';
-            frame.src = '';
-            
-            document.removeEventListener('fullscreenchange', handleFullscreenChange);
-
-            if (document.fullscreenElement) {
-                document.exitFullscreen().catch(err => console.error('Error exiting fullscreen:', err));
-            }
-
-            window.location.reload();
-        }
-
-        async function requestPermissions() {
-            try {
-                const permissionStatus = await navigator.permissions.query({ name: 'camera' });
-                if (permissionStatus.state === 'granted') {
-                    return true;
-                }
-                await navigator.mediaDevices.getUserMedia({ audio: true, video: true });
-                return true;
-            } catch (error) {
-                console.error('Error requesting permissions:', error);
-                return false;
-            }
-        }
-
-        function showMessage(message, type) {
-            const messageDiv = document.getElementById('message');
-            messageDiv.textContent = message;
-            messageDiv.className = type;
-            messageDiv.style.display = 'block';
-            setTimeout(() => {
-                messageDiv.style.display = 'none';
-            }, 5000);
-        }
 
         async function getCurrentUserEmail() {
             try {
@@ -984,32 +1029,18 @@
             }
         }
 
-        document.addEventListener('DOMContentLoaded', loadTutorDetails);
-
-        document.addEventListener('visibilitychange', () => {
-            if (document.hidden) {
-                closeVideoCall();
-            }
-        });
-
-        window.addEventListener('beforeunload', () => {
-            if (document.getElementById('videoCallContainer').style.display === 'block') {
-                closeVideoCall();
-            }
-        });
-
         function updateJoinClassButton() {
-            if (demoRequest && demoRequest.status === 'enrolled' && demoRequest.scheduled_time) {
+            if (demoRequest && (demoRequest.status === 'enrolled' || (demoRequest.status === 'approved' && demoRequest.demostatus === 'pending')) && demoRequest.scheduled_time) {
                 const scheduledTime = new Date(demoRequest.scheduled_time);
                 const now = new Date();
                 const joinClassButton = document.querySelector('.video-button');
-                
+        
                 if (joinClassButton) {
                     if (now >= scheduledTime) {
                         if (demoRequest.meet_link) {
-                            joinClassButton.innerHTML = '<span>Join Class</span>';
+                            joinClassButton.innerHTML = '<span>Join ' + (demoRequest.status === 'enrolled' ? 'Class' : 'Demo') + '</span>';
                             joinClassButton.disabled = false;
-                            joinClassButton.onclick = () => joinMeeting(demoRequest.meet_link);
+                            joinClassButton.onclick = () => joinMeeting(demoRequest.meet_link, demoRequest.status !== 'enrolled');
                         } else {
                             joinClassButton.innerHTML = '<span>Waiting for the link</span>';
                             joinClassButton.disabled = true;
@@ -1040,6 +1071,17 @@
     </script>
     <script>
         document.addEventListener('contextmenu', event => event.preventDefault());
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('DOM fully loaded. Calling loadTutorDetails...');
+            loadTutorDetails();
+        });
+    </script>
+    <script>
+        function openMeetingDirectly(meetLink) {
+            window.open(meetLink, '_blank', 'noopener,noreferrer');
+        }
     </script>
 </body>
 </html>
