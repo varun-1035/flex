@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FLEX EDUCATION </title>
+    <title>TutorConnect Platform</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <script src="https://unpkg.com/@dotlottie/player-component@2.7.12/dist/dotlottie-player.mjs" type="module"></script>
@@ -151,38 +151,124 @@
             background: rgba(21, 24, 35, 0.95);
             backdrop-filter: blur(10px);
             z-index: 1001;
-            padding: 20px;
+            padding: 60px 20px 20px;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
             gap: 20px;
+        }
+
+        .mobile-menu .google-signin {
+            display: block;
+            width: 100%;
+            max-width: 200px;
+            margin: 10px auto;
+        }
+
+        .mobile-menu .nav-links {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+        }
+
+        .mobile-menu .nav-link {
+            font-size: 18px;
+            padding: 15px 0;
+            width: 100%;
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .mobile-menu .search-bar {
+            width: 100%;
+            max-width: 300px;
+            margin: 10px 0;
+        }
+
+        .mobile-menu .google-signin {
+            margin-top: 20px;
         }
 
         .mobile-menu.active {
             display: flex;
         }
 
-        .mobile-menu .logo {
-            margin-bottom: 20px;
-        }
-
-        .mobile-menu .nav-links {
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .mobile-menu .nav-link {
-            font-size: 18px;
-            padding: 10px 0;
-        }
-
-        .mobile-menu .search-bar {
+        .mobile-signin {
             width: 100%;
             max-width: 300px;
+            margin: 10px 0;
         }
 
-        .mobile-menu .google-signin {
-            margin-top: 20px;
+        .mobile-user-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--color-tertiary);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            cursor: pointer;
+            margin: 10px auto;
+        }
+
+        .mobile-user-dropdown {
+            width: 100%;
+            text-align: center;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+
+        .mobile-user-dropdown a {
+            color: white;
+            text-decoration: none;
+            padding: 10px;
+            display: block;
+        }
+
+
+        .mobile-user-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--color-tertiary);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            cursor: pointer;
+            margin: 10px auto;
+        }
+
+        .mobile-user-dropdown {
+            width: 100%;
+            text-align: center;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+
+        .mobile-user-dropdown a {
+            color: white;
+            text-decoration: none;
+            padding: 10px;
+            display: block;
+        }
+
+        .mobile-signin {
+            width: 100%;
+            max-width: 300px;
+            margin: 10px 0;
+        }
+
+        .mobile-menu .auth-toggle {
+            color: var(--color-light);
+            margin-top: 10px;
+            text-align: center;
+            cursor: pointer;
         }
 
         .close-menu {
@@ -429,12 +515,19 @@
                 justify-content: space-between;
             }
 
-            .nav-links, .search-bar, .google-signin {
+            .nav-links, .search-bar {
                 display: none;
             }
 
             .menu-button {
                 display: block;
+            }
+
+            .google-signin {
+                display: block;
+                width: 100%;
+                max-width: 200px;
+                margin: 10px auto;
             }
 
             .hero h1 {
@@ -677,10 +770,10 @@
         <div class="nav-content">
             <a href="#" class="logo">
                 <div class="logo-icon"></div>
-                <span>FLEX EDUCATION</span>
+                <span>TutorConnect</span>
             </a>
             <div class="nav-links">
-                <a href="index.html" class="nav-link">HOME</a>
+                <a href="home.html" class="nav-link">HOME</a>
                 <a href="tutors.html" class="nav-link">FIND TUTORS</a>
                 <a href="registertutor.html" class="nav-link">BECOME A TUTOR</a>
             </div>
@@ -706,17 +799,23 @@
         <button class="close-menu">&times;</button>
         <a href="#" class="logo">
             <div class="logo-icon"></div>
-            <span>Flexeducation</span>
+            <span>TutorConnect</span>
         </a>
         <div class="nav-links">
-            <a href="index.html" class="nav-link">HOME</a>
+            <a href="home.html" class="nav-link">HOME</a>
             <a href="tutors.html" class="nav-link">FIND TUTORS</a>
             <a href="registertutor.html" class="nav-link">BECOME A TUTOR</a>
         </div>
         <div class="search-bar">
             <input type="text" class="search-input" placeholder="Search...">
         </div>
-        <button class="google-signin">Sign in with Google</button>
+        <button class="google-signin mobile-signin">Sign in with Google</button>
+        <div class="mobile-user-circle" style="display: none;">
+            <span class="user-initial"></span>
+        </div>
+        <div class="mobile-user-dropdown" style="display: none;">
+            <a href="#" class="mobile-logout">Logout</a>
+        </div>
     </div>
 
     <main class="main-content">
@@ -790,7 +889,7 @@
                 </div>
             </div>
             <div class="footer-bottom">
-                <p>&copy; 2024 Flexeducation. All rights reserved. Transforming education through technology.</p>
+                <p>&copy; 2024 TutorConnect. All rights reserved. Transforming education through technology.</p>
             </div>
         </div>
     </footer>
@@ -909,10 +1008,27 @@
 
         menuButton.addEventListener('click', () => {
             mobileMenu.classList.add('active');
+            document.body.style.overflow = 'hidden'; // Prevent scrolling when menu is open
         });
 
         closeMenuButton.addEventListener('click', () => {
             mobileMenu.classList.remove('active');
+            document.body.style.overflow = ''; // Restore scrolling
+        });
+
+        // Close menu when clicking outside
+        document.addEventListener('click', (e) => {
+            if (mobileMenu.classList.contains('active') && 
+                !mobileMenu.contains(e.target) && 
+                !menuButton.contains(e.target)) {
+                mobileMenu.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+        });
+
+        // Prevent clicks inside menu from closing it
+        mobileMenu.addEventListener('click', (e) => {
+            e.stopPropagation();
         });
 
         // Auth functionality
@@ -1016,10 +1132,21 @@
         }
 
         function updateUIAfterLogin(user) {
+            // Desktop UI updates
             authModal.style.display = 'none';
             googleSignInBtn.style.display = 'none';
             userCircle.style.display = 'flex';
             userCircle.textContent = user.email[0].toUpperCase();
+
+            // Mobile UI updates
+            const mobileSignin = document.querySelector('.mobile-signin');
+            const mobileUserCircle = document.querySelector('.mobile-user-circle');
+            const mobileUserDropdown = document.querySelector('.mobile-user-dropdown');
+        
+            mobileSignin.style.display = 'none';
+            mobileUserCircle.style.display = 'flex';
+            mobileUserCircle.textContent = user.email[0].toUpperCase();
+            mobileUserDropdown.style.display = 'block';
         }
 
         userCircle.onclick = function() {
@@ -1038,13 +1165,88 @@
         }
 
         function updateUIAfterLogout() {
+            // Desktop UI updates
             userCircle.style.display = 'none';
             userDropdown.style.display = 'none';
             googleSignInBtn.style.display = 'block';
-            location.reload(); // Reload the page to reset the state
+
+            // Mobile UI updates
+            const mobileSignin = document.querySelector('.mobile-signin');
+            const mobileUserCircle = document.querySelector('.mobile-user-circle');
+            const mobileUserDropdown = document.querySelector('.mobile-user-dropdown');
+            
+            mobileSignin.style.display = 'block';
+            mobileUserCircle.style.display = 'none';
+            mobileUserDropdown.style.display = 'none';
+            
+            mobileMenu.style.display = 'none';
+            location.reload();
         }
 
+        // Add mobile auth event listeners
+        document.addEventListener('DOMContentLoaded', () => {
+            const mobileSignin = document.querySelector('.mobile-signin');
+            const mobileLogout = document.querySelector('.mobile-logout');
+            
+            mobileSignin.addEventListener('click', () => {
+                mobileMenu.style.display = 'none';
+                authModal.style.display = 'block';
+            });
+            
+            mobileLogout.addEventListener('click', async () => {
+                try {
+                    const { error } = await supabase.auth.signOut();
+                    if (error) throw error;
+                    updateUIAfterLogout();
+                } catch (error) {
+                    console.error('Error signing out:', error);
+                    alert('Error signing out: ' + error.message);
+                }
+            });
+        });
+
         // Check for existing session on page load
+        function updateUIAfterLogout() {
+            // Desktop UI updates
+            userCircle.style.display = 'none';
+            userDropdown.style.display = 'none';
+            googleSignInBtn.style.display = 'block';
+
+            // Mobile UI updates
+            const mobileSignin = document.querySelector('.mobile-signin');
+            const mobileUserCircle = document.querySelector('.mobile-user-circle');
+            const mobileUserDropdown = document.querySelector('.mobile-user-dropdown');
+            
+            mobileSignin.style.display = 'block';
+            mobileUserCircle.style.display = 'none';
+            mobileUserDropdown.style.display = 'none';
+            
+            mobileMenu.style.display = 'none';
+            location.reload();
+        }
+
+        // Add mobile auth event listeners
+        document.addEventListener('DOMContentLoaded', () => {
+            const mobileSignin = document.querySelector('.mobile-signin');
+            const mobileLogout = document.querySelector('.mobile-logout');
+            
+            mobileSignin.addEventListener('click', () => {
+                mobileMenu.style.display = 'none';
+                authModal.style.display = 'block';
+            });
+            
+            mobileLogout.addEventListener('click', async () => {
+                try {
+                    const { error } = await supabase.auth.signOut();
+                    if (error) throw error;
+                    updateUIAfterLogout();
+                } catch (error) {
+                    console.error('Error signing out:', error);
+                    alert('Error signing out: ' + error.message);
+                }
+            });
+        });
+
         window.addEventListener('DOMContentLoaded', async () => {
             try {
                 const { data: { session } } = await supabase.auth.getSession();
@@ -1060,4 +1262,3 @@
     </script>
 </body>
 </html>
-
