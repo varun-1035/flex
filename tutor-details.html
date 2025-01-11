@@ -350,7 +350,6 @@
             color: var(--color-light);
         }
 
-        /* New styles for back button */
         .back-button {
             position: absolute;
             top: 20px;
@@ -376,7 +375,6 @@
             transform: scale(1.1);
         }
 
-        /* Responsive styles */
         @media (max-width: 768px) {
             .container {
                 padding: 30px 10px 10px;
@@ -424,6 +422,12 @@
         <div id="tutorDetails" class="tutor-card">
             <!-- Tutor details will be loaded here -->
             <div id="errorMessage" style="display: none; color: red; text-align: center; margin-top: 20px;"></div>
+        </div>
+        <div id="videoCallContainer" style="display: none;">
+            <div class="video-interface">
+                <iframe id="jioMeetFrame" allow="camera; microphone; fullscreen; display-capture; autoplay" allowfullscreen></iframe>
+            </div>
+            <button class="close-button" onclick="closeVideoCall()">Close</button>
         </div>
     </div>
 
@@ -773,7 +777,7 @@
         }
 
         function showMessage(message, type) {
-            console.log(`${type.toUpperCase()}: ${message}`); // Always log the message
+            console.log(`${type.toUpperCase()}: ${message}`);
             
             const messageDiv = document.getElementById('message');
             const errorMessageDiv = document.getElementById('errorMessage');
@@ -831,13 +835,13 @@
                 const priceKey = currentClassType === 'individual' 
                     ? `${demoRequest.assigned_stage}_price` 
                     : `group_${demoRequest.assigned_stage}_price`;
-                basePrice = currentTutor[priceKey] || 0; // Add fallback to 0
+                basePrice = currentTutor[priceKey] || 0;
             } else {
                 basePrice = currentClassType === 'individual' ? currentTutor.initial_price : currentTutor.group_initial_price;
             }
-            basePrice = parseFloat(basePrice) || 0; // Ensure basePrice is a number
+            basePrice = parseFloat(basePrice) || 0;
             const totalAmount = basePrice * classCount;
-            document.getElementById('totalAmount').textContent = `$${totalAmount.toFixed(2)}`; // Format to 2 decimal places
+            document.getElementById('totalAmount').textContent = `$${totalAmount.toFixed(2)}`;
         }
 
         async function enrollCourse() {
@@ -886,7 +890,7 @@
                     const priceKey = currentClassType === 'individual' 
                         ? `${demoRequest.assigned_stage}_price` 
                         : `group_${demoRequest.assigned_stage}_price`;
-                    baseAmount = parseFloat(currentTutor[priceKey]) || 0; // Parse and fallback to 0
+                    baseAmount = parseFloat(currentTutor[priceKey]) || 0;
                 } else {
                     baseAmount = parseFloat(currentClassType === 'individual' ? currentTutor.initial_price : currentTutor.group_initial_price) || 0;
                 }
@@ -900,11 +904,10 @@
                 const totalAmount = baseAmount * classCount;
 
                 console.log('Calculated total amount:', totalAmount);
-
                 console.log('Selected timing:', selectedTiming);
 
                 const options = {
-                    key: 'rzp_live_srlxaZOzD077PI', // Live key
+                    key: 'rzp_live_srlxaZOzD077PI',
                     amount: totalAmount * 100,
                     currency: 'INR',
                     name: 'TutorConnect',
@@ -930,7 +933,7 @@
                                 class_count: classCount,
                                 total_amount: totalAmount,
                                 enrollment_date: new Date().toISOString(),
-                                expiry_date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString() // 30 days from now
+                                expiry_date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
                             };
 
                             console.log('Updating demo request with enrollment data:', enrollmentData);
@@ -1010,12 +1013,19 @@
 
         async function joinMeeting(meetLink, isDemoClass = false) {
             if (isDemoClass) {
-                openMeetingDirectly(meetLink);
+                // For demo classes, open the meet link in the same tab
+                document.getElementById('jioMeetFrame').src = meetLink;
+                document.getElementById('videoCallContainer').style.display = 'block';
             } else {
+                // For enrolled classes, redirect to my-courses.html
                 window.location.href = `my-courses.html?meet_link=${encodeURIComponent(meetLink)}`;
             }
         }
 
+        function closeVideoCall() {
+            document.getElementById('jioMeetFrame').src = '';
+            document.getElementById('videoCallContainer').style.display = 'none';
+        }
 
         async function getCurrentUserEmail() {
             try {
@@ -1067,7 +1077,7 @@
                 updateTutorDetailsUI(currentTutor, demoRequest);
                 updateJoinClassButton();
             }
-        }, 60000); // Check every minute
+        }, 60000);
     </script>
     <script>
         document.addEventListener('contextmenu', event => event.preventDefault());
@@ -1078,11 +1088,5 @@
             loadTutorDetails();
         });
     </script>
-    <script>
-        function openMeetingDirectly(meetLink) {
-            window.open(meetLink, '_blank', 'noopener,noreferrer');
-        }
-    </script>
 </body>
 </html>
-
