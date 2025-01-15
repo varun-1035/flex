@@ -504,6 +504,16 @@
             display: none;
         }
 
+        .upcoming-course {
+            cursor: default;
+        }
+
+        .upcoming-course:hover {
+            transform: none;
+            box-shadow: none;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
         @media (max-width: 768px) {
             .nav-container {
                 top: 10px;
@@ -587,7 +597,7 @@
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
 
-        .auth-form input {
+        .auth-form input, .auth-form select {
             width: 100%;
             padding: 10px;
             margin: 10px 0;
@@ -760,6 +770,11 @@
                 text-align: center;
             }
         }
+
+        .price-blur {
+            filter: blur(4px);
+            user-select: none;
+        }
     </style>
 </head>
 <body>
@@ -769,13 +784,13 @@
     <nav class="nav-container">
         <div class="nav-content">
             <a href="#" class="logo">
-                <div class="logo-icon"></div>
-                <span>TutorConnect</span>
+                <img src="vidyamitrlogo.jpg" alt="Vidyamitr Logo" class="logo-icon" style="width: 30px; height: 30px;">
+                <span>Vidyamitr</span>
             </a>
             <div class="nav-links">
                 <a href="index.html" class="nav-link">HOME</a>
                 <a href="tutors.html" class="nav-link">FIND TUTORS</a>
-                <a href="#not updated" class="nav-link">BECOME A TUTOR</a>
+                <a href="registertutor.html" class="nav-link">BECOME A TUTOR</a>
                 <a href="my-courses.html" class="nav-link">MY COURSES</a>
             </div>
             <div class="search-bar">
@@ -799,8 +814,8 @@
     <div class="mobile-menu">
         <button class="close-menu">&times;</button>
         <a href="#" class="logo">
-            <div class="logo-icon"></div>
-            <span>TutorConnect</span>
+            <img src="vidyamitrlogo.jpg" alt="Vidyamitr Logo" class="logo-icon" style="width: 30px; height: 30px;">
+            <span>Vidyamitr</span>
         </a>
         <div class="nav-links">
             <a href="home.html" class="nav-link">HOME</a>
@@ -850,10 +865,9 @@
             </div>
         </section>
 
-        <section class="section">
+        <section        class="section">
             <div class="container">
-                <h2 class="section-title">Demanded Courses</h2>
-                <div class="scroll-section">
+                <h2 class="section-title">Demanded Courses</h2>                <div class="scroll-section">
                     <div id="demandedCoursesGrid" class="course-grid"></div>
                 </div>
             </div>
@@ -861,19 +875,27 @@
 
         <section class="section">
             <div class="container">
-                <h2 class="section-title">Programming Courses</h2>
+                <h2 class="sectiontitle">Programming Courses</h2>
                 <div class="scroll-section">
                     <div id="programmingCoursesGrid" class="course-grid"></div>
                 </div>
             </div>
         </section>
 
+        <section class="section">
+            <div class="container">
+                <h2 class="section-title">Upcoming Courses</h2>
+                <div class="scroll-section">
+                    <div id="upcomingCoursesGrid" class="course-grid"></div>
+                </div>
+            </div>
+        </section>
     </main>
     <footer class="footer">
         <div class="container">
             <div class="footer-content">
                 <div class="footer-section">
-                    <h3>TutorConnect</h3>
+                    <h3>Vidyamitr</h3>
                     <p>Empowering learning through personalized connections.</p>
                 </div>
                 <div class="footer-section">
@@ -887,12 +909,12 @@
                 </div>
                 <div class="footer-section">
                     <h3>Contact</h3>
-                    <p>Email: <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="60131510100f1214201415140f12030f0e0e0503144e030f0d">[email&#160;protected]</a></p>
+                    <p>Email: <a href="mailto:info@vidyamitr.com">info@vidyamitr.com</a></p>
                     <p>Phone: +1 (555) 123-4567</p>
                 </div>
             </div>
             <div class="footer-bottom">
-                <p>&copy; 2024 TutorConnect. All rights reserved. Transforming education through technology.</p>
+                <p>&copy; 2024 Vidyamitr. All rights reserved. Transforming education through technology.</p>
             </div>
         </div>
     </footer>
@@ -903,8 +925,13 @@
                 <h2 id="authTitle">Sign In</h2>
                 <input type="email" id="email" placeholder="Email" required>
                 <input type="password" id="password" placeholder="Password" required>
+                <select id="countryCode" style="display: none;">
+                    <option value="+91">India (+91)</option>
+                    <option value="+1">USA (+1)</option>
+                    <option value="+61">Australia (+61)</option>
+                </select>
+                <input type="tel" id="phone" placeholder="Phone Number" style="display: none;">
                 <input type="text" id="name" placeholder="Full Name" style="display: none;">
-                <input type="tel" id="phone" placeholder="Phone Number (IND, USA, AUS)" style="display: none;">
                 <input type="text" id="grade" placeholder="Grade" style="display: none;">
                 <button type="submit" id="submitBtn">Submit</button>
                 <p id="newUserToggle" class="auth-toggle">New user? Sign up</p>
@@ -913,52 +940,54 @@
     </div>
 
     <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
-        const SUPABASE_URL = 'https://qjdpzaezmtsdnnxuphim.supabase.co';
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFqZHB6YWV6bXRzZG5ueHVwaGltIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzEwODQyNzcsImV4cCI6MjA0NjY2MDI3N30.1lCVZaxUsm3uROyKtErN9fYr1KxtaY9yj0jNv1k7WmY';
+const SUPABASE_URL = 'https://qjdpzaezmtsdnnxuphim.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFqZHB6YWV6bXRzZG5ueHVwaGltIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzEwODQyNzcsImV4cCI6MjA0NjY2MDI3N30.1lCVZaxUsm3uROyKtErN9fYr1KxtaY9yj0jNv1k7WmY';
 
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        async function fetchTutors(displayType) {
-            try {
-                const { data, error } = await supabase
-                    .from('alltutor')
-                    .select('*')
-                    .eq('display', displayType);
+let isLoggedIn = false;
 
-                if (error) throw error;
-                return data;
-            } catch (error) {
-                console.error(`Error fetching ${displayType} tutors:`, error);
-                throw error;
-            }
-        }
+async function fetchTutors(displayType) {
+    try {
+        const { data, error } = await supabase
+            .from('alltutor')
+            .select('*')
+            .eq('display', displayType);
 
-        function getScheduleText(tutor) {
-            if (tutor.schedule) {
-                return tutor.schedule;
-            }
-            return 'Schedule not available';
-        }
+        if (error) throw error;
+        return data;
+    } catch (error) {
+        console.error(`Error fetching ${displayType} tutors:`, error);
+        throw error;
+    }
+}
 
-        function getPriceText(tutor) {
-            if (tutor.initial_price) {
-                return `$${tutor.initial_price}/45min`;
-            }
-            return 'Price not available';
-        }
+function getScheduleText(tutor) {
+    if (tutor.schedule) {
+        return tutor.schedule;
+    }
+    return 'Schedule not available';
+}
 
-        function getRatingText(tutor) {
-            if(typeof tutor.rating === 'number') {
-                return tutor.rating.toFixed(1);
-            }
-            return 'N/A';
-        }
+function getPriceText(tutor) {
+    if (tutor.initial_price) {
+        return `$${tutor.initial_price}/45min`;
+    }
+    return 'Price not available';
+}
 
-        function displayTutors(tutors, elementId) {
-            const tutorGrid = document.getElementById(elementId);
-            tutorGrid.innerHTML = tutors.map(tutor => `
-        <div class="course-card">
-            <a href="tutor-details.html?id=${tutor.id}" class="tutor-link">
+function getRatingText(tutor) {
+    if(typeof tutor.rating === 'number') {
+        return tutor.rating.toFixed(1);
+    }
+    return 'N/A';
+}
+
+function displayTutors(tutors, elementId, isUpcoming = false) {
+    const tutorGrid = document.getElementById(elementId);
+    tutorGrid.innerHTML = tutors.map(tutor => `
+        <div class="course-card ${isUpcoming ? 'upcoming-course' : ''}">
+            ${isUpcoming ? `
                 <div class="course-image" style="background-image: url('${tutor.image_url || 'https://via.placeholder.com/300x150'}')">
                 </div>
                 <div class="course-content">
@@ -967,301 +996,290 @@
                     <p class="course-schedule">${tutor.schedule_type || 'Schedule not available'}</p>
                     <p class="course-experience">${tutor.experience} years of experience</p>
                     <div class="course-meta">
-                        <span class="course-price">${getPriceText(tutor)}</span>
+                        <span class="course-price ${isLoggedIn ? '' : 'price-blur'}">${getPriceText(tutor)}</span>
                         <span class="course-rating">★★★★★ ${getRatingText(tutor)}</span>
                     </div>
                 </div>
-            </a>
+            ` : `
+                <a href="tutor-details.html?id=${tutor.id}" class="tutor-link">
+                    <div class="course-image" style="background-image: url('${tutor.image_url || 'https://via.placeholder.com/300x150'}')">
+                    </div>
+                    <div class="course-content">
+                        <h3 class="course-title">${tutor.specialization}</h3>
+                        <p class="course-name">${tutor.name}</p>
+                        <p class="course-schedule">${tutor.schedule_type || 'Schedule not available'}</p>
+                        <p class="course-experience">${tutor.experience} years of experience</p>
+                        <div class="course-meta">
+                            <span class="course-price ${isLoggedIn ? '' : 'price-blur'}">${getPriceText(tutor)}</span>
+                            <span class="course-rating">★★★★★ ${getRatingText(tutor)}</span>
+                        </div>
+                    </div>
+                </a>
+            `}
         </div>
-            `).join('');
-        }
+    `).join('');
+}
 
-        async function initializePage() {
-            const errorElement = document.getElementById('error-message');
+async function initializePage() {
+    const errorElement = document.getElementById('error-message');
 
-            try {
-                document.getElementById('loadingAnimation').style.display = 'flex';
+    try {
+        document.getElementById('loadingAnimation').style.display = 'flex';
 
-                const topRatedTutors = await fetchTutors('toprated');
-                displayTutors(topRatedTutors, 'tutorGrid');
+        const topRatedTutors = await fetchTutors('toprated');
+        displayTutors(topRatedTutors, 'tutorGrid');
 
-                const anticipatedTutors = await fetchTutors('anticipated');
-                displayTutors(anticipatedTutors, 'anticipatedCoursesGrid');
+        const anticipatedTutors = await fetchTutors('anticipated');
+        displayTutors(anticipatedTutors, 'anticipatedCoursesGrid');
 
-                const demandedTutors = await fetchTutors('demanded');
-                displayTutors(demandedTutors, 'demandedCoursesGrid');
+        const demandedTutors = await fetchTutors('demanded');
+        displayTutors(demandedTutors, 'demandedCoursesGrid');
 
-                const programmingTutors = await fetchTutors('programming');
-                displayTutors(programmingTutors, 'programmingCoursesGrid');
+        const programmingTutors = await fetchTutors('programming');
+        displayTutors(programmingTutors, 'programmingCoursesGrid');
 
-                errorElement.style.display = 'none';
-            } catch (error) {
-                console.error('Error initializing page:', error);
-                errorElement.textContent = `Error loading content: ${error.message}`;
-                errorElement.style.display = 'block';
-            } finally {
-                document.getElementById('loadingAnimation').style.display = 'none';
-            }
-        }
+        const upcomingTutors = await fetchTutors('upcoming');
+        displayTutors(upcomingTutors, 'upcomingCoursesGrid', true);
 
-        // Mobile menu functionality
-        const menuButton = document.querySelector('.menu-button');
-        const closeMenuButton = document.querySelector('.close-menu');
-        const mobileMenu = document.querySelector('.mobile-menu');
+        errorElement.style.display = 'none';
+    } catch (error) {
+        console.error('Error initializing page:', error);
+        errorElement.textContent = `Error loading content: ${error.message}`;
+        errorElement.style.display = 'block';
+    } finally {
+        document.getElementById('loadingAnimation').style.display = 'none';
+    }
+}
 
-        menuButton.addEventListener('click', () => {
-            mobileMenu.classList.add('active');
-            document.body.style.overflow = 'hidden'; // Prevent scrolling when menu is open
-        });
+// Mobile menu functionality
+const menuButton = document.querySelector('.menu-button');
+const closeMenuButton = document.querySelector('.close-menu');
+const mobileMenu = document.querySelector('.mobile-menu');
 
-        closeMenuButton.addEventListener('click', () => {
-            mobileMenu.classList.remove('active');
-            document.body.style.overflow = ''; // Restore scrolling
-        });
+menuButton.addEventListener('click', () => {
+    mobileMenu.classList.add('active');
+    document.body.style.overflow = 'hidden'; // Prevent scrolling when menu is open
+});
 
-        // Close menu when clicking outside
-        document.addEventListener('click', (e) => {
-            if (mobileMenu.classList.contains('active') && 
-                !mobileMenu.contains(e.target) && 
-                !menuButton.contains(e.target)) {
-                mobileMenu.classList.remove('active');
-                document.body.style.overflow = '';
-            }
-        });
+closeMenuButton.addEventListener('click', () => {
+    mobileMenu.classList.remove('active');
+    document.body.style.overflow = ''; // Restore scrolling
+});
 
-        // Prevent clicks inside menu from closing it
-        mobileMenu.addEventListener('click', (e) => {
-            e.stopPropagation();
-        });
+// Close menu when clicking outside
+document.addEventListener('click', (e) => {
+    if (mobileMenu.classList.contains('active') && 
+        !mobileMenu.contains(e.target) && 
+        !menuButton.contains(e.target)) {
+        mobileMenu.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+});
 
-        // Auth functionality
-        const authModal = document.getElementById('authModal');
-        const authForm = document.getElementById('authForm');
-        const authTitle = document.getElementById('authTitle');
-        const nameInput = document.getElementById('name');
-        const phoneInput = document.getElementById('phone');
-        const gradeInput = document.getElementById('grade');
-        const submitBtn = document.getElementById('submitBtn');
-        const newUserToggle = document.getElementById('newUserToggle');
-        const googleSignInBtn = document.querySelector('.google-signin');
-        const closeBtn = document.getElementsByClassName('close')[0];
-        const userCircle = document.querySelector('.user-circle');
-        const userDropdown = document.querySelector('.user-dropdown');
-        const logoutButton = document.getElementById('logoutButton');
+// Prevent clicks inside menu from closing it
+mobileMenu.addEventListener('click', (e) => {
+    e.stopPropagation();
+});
 
-        let isSignUp = false;
+// Auth functionality
+const authModal = document.getElementById('authModal');
+const authForm = document.getElementById('authForm');
+const authTitle = document.getElementById('authTitle');
+const nameInput = document.getElementById('name');
+const phoneInput = document.getElementById('phone');
+const gradeInput = document.getElementById('grade');
+const submitBtn = document.getElementById('submitBtn');
+const newUserToggle = document.getElementById('newUserToggle');
+const googleSignInBtn = document.querySelector('.google-signin');
+const closeBtn = document.getElementsByClassName('close')[0];
+const userCircle = document.querySelector('.user-circle');
+const userDropdown = document.querySelector('.user-dropdown');
+const logoutButton = document.getElementById('logoutButton');
+const countryCodeSelect = document.getElementById('countryCode');
 
-        googleSignInBtn.onclick = function() {
-            authModal.style.display = 'block';
-        }
+let isSignUp = false;
 
-        closeBtn.onclick = function() {
-            authModal.style.display = 'none';
-        }
+googleSignInBtn.onclick = function() {
+    authModal.style.display = 'block';
+}
 
-        window.onclick = function(event) {
-            if (event.target == authModal) {
-                authModal.style.display = 'none';
-            }
-        }
+closeBtn.onclick = function() {
+    authModal.style.display = 'none';
+}
 
-        newUserToggle.onclick = function() {
-            isSignUp = !isSignUp;
-            if (isSignUp) {
-                authTitle.textContent = 'Sign Up';
-                nameInput.style.display = 'block';
-                phoneInput.style.display = 'block';
-                gradeInput.style.display = 'block';
-                submitBtn.textContent = 'Sign Up';
-                newUserToggle.textContent = 'Already have an account? Sign in';
-            } else {
-                authTitle.textContent = 'Sign In';
-                nameInput.style.display = 'none';
-                phoneInput.style.display = 'none';
-                gradeInput.style.display = 'none';
-                submitBtn.textContent = 'Sign In';
-                newUserToggle.textContent = 'New user? Sign up';
-            }
-        }
+window.onclick = function(event) {
+    if (event.target == authModal) {
+        authModal.style.display = 'none';
+    }
+}
 
-        authForm.onsubmit = async function(e) {
-            e.preventDefault();
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
+newUserToggle.onclick = function() {
+    isSignUp = !isSignUp;
+    if (isSignUp) {
+        authTitle.textContent = 'Sign Up';
+        nameInput.style.display = 'block';
+        phoneInput.style.display = 'block';
+        gradeInput.style.display = 'block';
+        countryCodeSelect.style.display = 'block';
+        submitBtn.textContent = 'Sign Up';
+        newUserToggle.textContent = 'Already have an account? Sign in';
+    } else {
+        authTitle.textContent = 'Sign In';
+        nameInput.style.display = 'none';
+        phoneInput.style.display = 'none';
+        gradeInput.style.display = 'none';
+        countryCodeSelect.style.display = 'none';
+        submitBtn.textContent = 'Sign In';
+        newUserToggle.textContent = 'New user? Sign up';
+    }
+}
 
-            if (isSignUp) {
-                const name = document.getElementById('name').value;
-                const phone = document.getElementById('phone').value;
-                const grade = document.getElementById('grade').value;
-                try {
-                    const { data: authData, error: authError } = await supabase.auth.signUp({
-                        email,
-                        password,
-                    });
-                    if (authError) throw authError;
+authForm.onsubmit = async function(e) {
+    e.preventDefault();
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
 
-                    const { data: userData, error: userError } = await supabase
-                        .from('users')
-                        .insert([
-                            { 
-                                email, 
-                                name, 
-                                phone, 
-                                grade
-                            }
-                        ]);
-                    if (userError) throw userError;
-
-                    alert('Sign up successful! Please check your email for verification.');
-                } catch (error) {
-                    console.error('Error signing up:', error);
-                    alert('Error signing up: ' + error.message);
-                }
-            } else {
-                try {
-                    const { data, error } = await supabase.auth.signInWithPassword({
-                        email,
-                        password
-                    });
-                    if (error) throw error;
-
-                    console.log('Login successful:', data);
-                    updateUIAfterLogin(data.user);
-                } catch (error) {
-                    console.error('Error signing in:', error);
-                    alert('Error signing in: ' + error.message);
-                }
-            }
-        }
-
-        function updateUIAfterLogin(user) {
-            // Desktop UI updates
-            authModal.style.display = 'none';
-            googleSignInBtn.style.display = 'none';
-            userCircle.style.display = 'flex';
-            userCircle.textContent = user.email[0].toUpperCase();
-
-            // Mobile UI updates
-            const mobileSignin = document.querySelector('.mobile-signin');
-            const mobileUserCircle = document.querySelector('.mobile-user-circle');
-            const mobileUserDropdown = document.querySelector('.mobile-user-dropdown');
-        
-            mobileSignin.style.display = 'none';
-            mobileUserCircle.style.display = 'flex';
-            mobileUserCircle.textContent = user.email[0].toUpperCase();
-            mobileUserDropdown.style.display = 'block';
-        }
-
-        userCircle.onclick = function() {
-            userDropdown.style.display = userDropdown.style.display === 'block' ? 'none' : 'block';
-        }
-
-        logoutButton.onclick = async function() {
-            try {
-                const { error } = await supabase.auth.signOut();
-                if (error) throw error;
-                updateUIAfterLogout();
-            } catch (error) {
-                console.error('Error signing out:', error);
-                alert('Error signing out: ' + error.message);
-            }
-        }
-
-        function updateUIAfterLogout() {
-            // Desktop UI updates
-            userCircle.style.display = 'none';
-            userDropdown.style.display = 'none';
-            googleSignInBtn.style.display = 'block';
-
-            // Mobile UI updates
-            const mobileSignin = document.querySelector('.mobile-signin');
-            const mobileUserCircle = document.querySelector('.mobile-user-circle');
-            const mobileUserDropdown = document.querySelector('.mobile-user-dropdown');
-            
-            mobileSignin.style.display = 'block';
-            mobileUserCircle.style.display = 'none';
-            mobileUserDropdown.style.display = 'none';
-            
-            mobileMenu.style.display = 'none';
-            location.reload();
-        }
-
-        // Add mobile auth event listeners
-        document.addEventListener('DOMContentLoaded', () => {
-            const mobileSignin = document.querySelector('.mobile-signin');
-            const mobileLogout = document.querySelector('.mobile-logout');
-            
-            mobileSignin.addEventListener('click', () => {
-                mobileMenu.style.display = 'none';
-                authModal.style.display = 'block';
+    if (isSignUp) {
+        const name = document.getElementById('name').value;
+        const countryCode = document.getElementById('countryCode').value;
+        const phone = countryCode + document.getElementById('phone').value;
+        const grade = document.getElementById('grade').value;
+        try {
+            const { data: authData, error: authError } = await supabase.auth.signUp({
+                email,
+                password,
             });
-            
-            mobileLogout.addEventListener('click', async () => {
-                try {
-                    const { error } = await supabase.auth.signOut();
-                    if (error) throw error;
-                    updateUIAfterLogout();
-                } catch (error) {
-                    console.error('Error signing out:', error);
-                    alert('Error signing out: ' + error.message);
-                }
-            });
-        });
+            if (authError) throw authError;
 
-        // Check for existing session on page load
-        function updateUIAfterLogout() {
-            // Desktop UI updates
-            userCircle.style.display = 'none';
-            userDropdown.style.display = 'none';
-            googleSignInBtn.style.display = 'block';
+            const { data: userData, error: userError } = await supabase
+                .from('users')
+                .insert([
+                    { 
+                        email, 
+                        name, 
+                        phone, 
+                        grade
+                    }
+                ]);
+            if (userError) throw userError;
 
-            // Mobile UI updates
-            const mobileSignin = document.querySelector('.mobile-signin');
-            const mobileUserCircle = document.querySelector('.mobile-user-circle');
-            const mobileUserDropdown = document.querySelector('.mobile-user-dropdown');
-            
-            mobileSignin.style.display = 'block';
-            mobileUserCircle.style.display = 'none';
-            mobileUserDropdown.style.display = 'none';
-            
-            mobileMenu.style.display = 'none';
-            location.reload();
+            alert('Sign up successful! Please check your email for verification.');
+        } catch (error) {
+            console.error('Error signing up:', error);
+            alert('Error signing up: ' + error.message);
         }
-
-        // Add mobile auth event listeners
-        document.addEventListener('DOMContentLoaded', () => {
-            const mobileSignin = document.querySelector('.mobile-signin');
-            const mobileLogout = document.querySelector('.mobile-logout');
-            
-            mobileSignin.addEventListener('click', () => {
-                mobileMenu.style.display = 'none';
-                authModal.style.display = 'block';
+    } else {
+        try {
+            const { data, error } = await supabase.auth.signInWithPassword({
+                email,
+                password
             });
-            
-            mobileLogout.addEventListener('click', async () => {
-                try {
-                    const { error } = await supabase.auth.signOut();
-                    if (error) throw error;
-                    updateUIAfterLogout();
-                } catch (error) {
-                    console.error('Error signing out:', error);
-                    alert('Error signing out: ' + error.message);
-                }
-            });
-        });
+            if (error) throw error;
 
-        window.addEventListener('DOMContentLoaded', async () => {
-            try {
-                const { data: { session } } = await supabase.auth.getSession();
-                console.log('Current session:', session);
-                if (session) {
-                    updateUIAfterLogin(session.user);
-                }
-            } catch (error) {
-                console.error('Error checking session:', error);
-            }
-            initializePage();
-        });
-    </script>
+            console.log('Login successful:', data);
+            updateUIAfterLogin(data.user);
+        } catch (error) {
+            console.error('Error signing in:', error);
+            alert('Error signing in: ' + error.message);
+        }
+    }
+}
+
+function updateUIAfterLogin(user) {
+    // Desktop UI updates
+    authModal.style.display = 'none';
+    googleSignInBtn.style.display = 'none';
+    userCircle.style.display = 'flex';
+    userCircle.textContent = user.email[0].toUpperCase();
+
+    // Mobile UI updates
+    const mobileSignin = document.querySelector('.mobile-signin');
+    const mobileUserCircle = document.querySelector('.mobile-user-circle');
+    const mobileUserDropdown = document.querySelector('.mobile-user-dropdown');
+
+    mobileSignin.style.display = 'none';
+    mobileUserCircle.style.display = 'flex';
+    mobileUserCircle.textContent = user.email[0].toUpperCase();
+    mobileUserDropdown.style.display = 'block';
+
+    // Update login status and refresh tutors display
+    isLoggedIn = true;
+    initializePage();
+}
+
+userCircle.onclick = function() {
+    userDropdown.style.display = userDropdown.style.display === 'block' ? 'none' : 'block';
+}
+
+logoutButton.onclick = async function() {
+    try {
+        const { error } = await supabase.auth.signOut();
+        if (error) throw error;
+        updateUIAfterLogout();
+    } catch (error) {
+        console.error('Error signing out:', error);
+        alert('Error signing out: ' + error.message);
+    }
+}
+
+function updateUIAfterLogout() {
+    // Desktop UI updates
+    userCircle.style.display = 'none';
+    userDropdown.style.display = 'none';
+    googleSignInBtn.style.display = 'block';
+
+    // Mobile UI updates
+    const mobileSignin = document.querySelector('.mobile-signin');
+    const mobileUserCircle = document.querySelector('.mobile-user-circle');
+    const mobileUserDropdown = document.querySelector('.mobile-user-dropdown');
+    
+    mobileSignin.style.display = 'block';
+    mobileUserCircle.style.display = 'none';
+    mobileUserDropdown.style.display = 'none';
+    
+    mobileMenu.style.display = 'none';
+
+    // Update login status and refresh tutors display
+    isLoggedIn = false;
+    initializePage();
+}
+
+// Add mobile auth event listeners
+document.addEventListener('DOMContentLoaded', () => {
+    const mobileSignin = document.querySelector('.mobile-signin');
+    const mobileLogout = document.querySelector('.mobile-logout');
+    
+    mobileSignin.addEventListener('click', () => {
+        mobileMenu.style.display = 'none';
+        authModal.style.display = 'block';
+    });
+    
+    mobileLogout.addEventListener('click', async () => {
+        try {
+            const { error } = await supabase.auth.signOut();
+            if (error) throw error;
+            updateUIAfterLogout();
+        } catch (error) {
+            console.error('Error signing out:', error);
+            alert('Error signing out: ' + error.message);
+        }
+    });
+});
+
+window.addEventListener('DOMContentLoaded', async () => {
+    try {
+        const { data: { session } } = await supabase.auth.getSession();
+        console.log('Current session:', session);
+        if (session) {
+            isLoggedIn = true;
+            updateUIAfterLogin(session.user);
+        }
+    } catch (error) {
+        console.error('Error checking session:', error);
+    }
+    initializePage();
+});
+</script>
 </body>
 </html>
+
